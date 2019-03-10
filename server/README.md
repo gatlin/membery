@@ -19,3 +19,9 @@ port `5432`.
 
 If you want different ports you can copy **`docker-compose.yml`** to
 **`docker-compose.override.yml`** and change the ports however you want.
+
+### Postgresql connection info
+
+Username: `membery`
+
+Password: `membery`
