@@ -1,0 +1,37 @@
+version: '2'
+services:
+  web:
+    working_dir: /app
+    build: ./
+    environment:
+      - FLASK_APP=api
+      - FLASK_DEBUG=1
+      - PYTHONDONTWRITEBYTECODE=yes
+      - 'RUN=flask run --host=0.0.0.0 --port=5000'
+    env_file: ./env_file
+    command: python -m flask run --host=0.0.0.0 --port=5000
+    networks:
+      - db_nw
+    volumes:
+      - ./:/app
+    ports:
+      - "5000:5000"
+
+  postgres:
+    restart: unless-stopped
+    image: postgres:9.6.10-alpine
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./schema/membery.sql:/docker-entrypoint-initdb.d/membery.sql
+      - membery-db-vol:/var/lib/postgresql/data
+    networks:
+      - db_nw
+    env_file: ./env_file
+
+volumes:
+  membery-db-vol:
+
+networks:
+  db_nw:
+    driver: bridge
