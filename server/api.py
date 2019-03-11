@@ -6,6 +6,7 @@ import psycopg2
 import json
 import resources
 from functools import wraps
+from flask_cors import CORS
 
 def make_error(msg, status_code=400):
     return { 'error': msg }, status_code
@@ -33,7 +34,7 @@ def create_app():
                          api_prefix + '/meetings',
                          api_prefix + '/meetings/',
                          api_prefix + '/meetings/<meeting_id>')
-
+    CORS(app)
     return app
 
 if __name__ == '__main__':
