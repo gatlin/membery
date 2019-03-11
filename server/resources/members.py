@@ -3,6 +3,7 @@ from flask_restful import reqparse, abort, Resource
 from db import get_db
 import psycopg2
 import json
+from auth import requires_auth
 
 class Members(Resource):
     '''
@@ -28,6 +29,8 @@ class Members(Resource):
 
     Everything but the timestamps is expected in a PUT request.
     '''
+
+    method_decorators = [ requires_auth ]
 
     def from_row(self, row):
         '''
