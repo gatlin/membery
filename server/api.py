@@ -5,6 +5,7 @@ from flask_restful import reqparse, abort, Api, Resource
 import psycopg2
 import json
 import resources
+from functools import wraps
 
 def make_error(msg, status_code=400):
     return { 'error': msg }, status_code
