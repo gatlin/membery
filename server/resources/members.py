@@ -144,7 +144,7 @@ class Members(Resource):
 
         query = '''
         insert into members (first_name, last_name, active, email, notes)
-        values (%s, %s, %s, %s, %s)
+        values (%s, %s, %s, %s, %s) returning id
         '''
 
         db = get_db()
@@ -157,10 +157,13 @@ class Members(Resource):
             return { 'error': str(e) }, 500
 
         # Now deal with roles
+        body['id'] = cur.fetchone()[0]
+        body['active'] = active
+        body['roles'] = roles or []
 
         db.commit()
         cur.close()
-        return { 'error': None }, 201
+        return { 'error': None, 'data': body }, 201
 
     def put(self, member_id=None):
         '''
@@ -299,7 +302,7 @@ class Members(Resource):
 
         db = get_db()
         cur = db.cursor()
-        cur.execute('select exists (select 1 from members where id = %s', (
+        cur.execute('select exists (select 1 from members where id = %s)', (
             member_id,))
         exists = cur.fetchone()[0]
         if not exists:
