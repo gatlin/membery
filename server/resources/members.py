@@ -66,9 +66,13 @@ class Members(Resource):
         cur.execute(query)
 
         def add_roles(member_obj):
+            member_obj['roles'] = []
             cur.execute('select role from members_roles where member = %s', (
                 member_obj['id'],))
-            member_obj['roles'] = list(cur.fetchall())
+
+            for role in cur.fetchall():
+                member_obj['roles'].append(role[0])
+
             return member_obj
 
         members = [add_roles(self.from_row(row)) for row in cur.fetchall()]
@@ -93,7 +97,9 @@ class Members(Resource):
         row = cur.fetchone()
 
         cur.execute('select role from members_roles where member = %s', (member_id,))
-        roles = list(cur.fetchall())
+        roles = []
+        for row in cur.fetchall():
+            roles.append(row[0])
 
         db.commit()
         cur.close()
@@ -179,8 +185,8 @@ class Members(Resource):
             }, 400
 
         query = '''
-        update members set first_name = %s and last_name = %s
-        and active = %s and email = %s updated = now()
+        update members set first_name = %s, last_name = %s,
+        active = %s, email = %s, notes = %s, updated = now()
         where id = %s
         '''
         db = get_db()
@@ -199,6 +205,7 @@ class Members(Resource):
                 body['last_name'],
                 body['active'],
                 body['email'],
+                body['notes'],
                 member_id))
         except Exception, e:
             cur.close()

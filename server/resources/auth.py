@@ -17,7 +17,20 @@ AUTH0_DOMAIN = read_config('AUTH0_DOMAIN')
 API_AUDIENCE = read_config('API_AUDIENCE')
 ALGORITHMS = ["RS256"]
 
-# Format error response and append status code
+def requires_scope(required_scope):
+    """Determines if the required scope is present in the access token
+    Args:
+        required_scope (str): The scope required to access the resource
+    """
+    token = get_token_auth_header()
+    unverified_claims = jwt.get_unverified_claims(token)
+    if unverified_claims.get("scope"):
+        token_scopes = unverified_claims["scope"].split()
+        for token_scope in token_scopes:
+            if token_scope == required_scope:
+                return True
+    return False
+
 def get_token_auth_header():
     """Obtains the Access Token from the Authorization Header
     """

@@ -10,14 +10,18 @@ export default class Auth extends EventEmitter {
         auth: {
             redirectUrl: AUTH_CONFIG.callbackUrl,
             responseType: 'token id_token',
-            audience: AUTH_CONFIG.apiUrl, 
-            params: { 
-                scope: 'openid profile' 
+            audience: AUTH_CONFIG.apiUrl,
+            params: {
+                scope: 'openid profile'
             }
         }
     });
 
     userProfile;
+
+    handleAuthentication() {
+        console.log('what does this do?');
+    }
 
     constructor() {
         super();
@@ -48,11 +52,6 @@ export default class Auth extends EventEmitter {
             localStorage.setItem('expires_at', expiresAt);
             // navigate to the home route
             history.replace('/home');
-
-            this.authFetch('http://localhost:5001/api/v1/members')
-                .then(response => {
-                    console.log('response', response);
-                });
         }
     }
 
@@ -92,6 +91,7 @@ export default class Auth extends EventEmitter {
     }
 
     authFetch(url, options) {
+        const prefix = 'http://localhost:5001/api/v1';
         const headers = {
             Accept: 'application/json',
             'Content-Type': 'application/json'
@@ -101,9 +101,8 @@ export default class Auth extends EventEmitter {
             headers['Authorization'] = 'Bearer ' + this.getAccessToken();
         }
 
-        return fetch(url, { headers, ...options })
-            .then(this.checkStatus)
-            .then(response => response.json());
+        return fetch(`${prefix}${url}`, { headers, ...options })
+            .then(this.checkStatus);
     }
 
     checkStatus(response) {

@@ -1,74 +1,74 @@
 import React, { Component } from 'react';
-import { Navbar, Button } from 'react-bootstrap';
+import { connect } from 'react-redux';
+import * as authActions from './Auth';
+import * as membersActions from './members';
 import './App.css';
 
-class App extends Component {
-    goTo(route) {
-        this.props.history.replace(`/${route}`);
-    }
+const App = ({
+    login,
+    logout,
+    goTo,
+    loadMembers,
+    isAuthenticated
+})=> (
+    <div>
+      <nav>
+        <header>
+          <div>
+            <a href="#">Membery</a>
+          </div>
+          <button
+            className="btn-margin"
+            onClick={() => { goTo('home'); }}
+          >
+            Home
+          </button>
+          {
+          !isAuthenticated() && (
+              <span id='main-btns'>
+                <button
+                  id="qsLoginBtn"
+                  className="btn-margin"
+                  onClick={() => { login(); }}
+                >
+                  Log In
+                </button>
+              </span>
+          )
+          }
+          {
+              isAuthenticated() && (
+                  <span id='main-btns'>
+                    <button
+                      id='btn-nav-members'
+                      onClick={() => {
+                          loadMembers();
+                          goTo('members');
+                      }}
+                    >
+                      Members
+                    </button>
+                    <button
+                      id="qsLogoutBtn"
+                      className="btn-margin"
+                      onClick={() => { logout(); }}
+                    >
+                      Log Out
+                    </button>
+                  </span>
+              )
+          }
+        </header>
+      </nav>
+    </div>
+);
 
-    login() {
-        this.props.auth.login();
-    }
-
-    logout() {
-        this.props.auth.logout();
-    }
-
-    componentDidMount() {
-        const { renewSession } = this.props.auth;
-
-        if (localStorage.getItem('isLoggedIn') === 'true') {
-            renewSession();
-        }
-    }
-
-    render() {
-        const { isAuthenticated } = this.props.auth;
-
-        return (
-            <div>
-              <Navbar fluid>
-                <Navbar.Header>
-                  <Navbar.Brand>
-                    <a href="#">Auth0 - React</a>
-                  </Navbar.Brand>
-                  <Button
-                    bsStyle="primary"
-                    className="btn-margin"
-                    onClick={this.goTo.bind(this, 'home')}
-                  >
-                    Home
-                  </Button>
-                  {
-                  !isAuthenticated() && (
-                      <Button
-                        id="qsLoginBtn"
-                        bsStyle="primary"
-                        className="btn-margin"
-                        onClick={this.login.bind(this)}
-                      >
-                        Log In
-                      </Button>
-                  )
-                  }
-                  {
-                      isAuthenticated() && (
-                          <Button
-                            id="qsLogoutBtn"
-                            bsStyle="primary"
-                            className="btn-margin"
-                            onClick={this.logout.bind(this)}
-                          >
-                            Log Out
-                          </Button>
-                      )
-                  }
-                </Navbar.Header>
-              </Navbar>
-            </div>
-        );
-    }
-}
-
-export default App;
+export default connect(
+    state => state,
+    dispatch => ({
+        login: () => dispatch(authActions.login()),
+        logout: () => dispatch(authActions.logout()),
+        isAuthenticated: () => dispatch(authActions.isAuthenticated()),
+        loadMembers: () => dispatch(membersActions.loadMembers())
+    })
+)(App);
