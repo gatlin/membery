@@ -3,7 +3,7 @@ from flask_restful import reqparse, abort, Resource
 from db import get_db
 import psycopg2
 import json
-from auth import requires_auth
+from auth import requires_auth, requires_scope
 
 class Members(Resource):
     '''
@@ -19,8 +19,7 @@ class Members(Resource):
         "email": <string | null>,
         "notes": <string | null>,
         "created": <timestamp>,
-        "updated": <timestamp>,
-        "roles": [<int:role ID>]
+        "updated": <timestamp>
     }
 
     Creating a member requires only:
@@ -30,7 +29,7 @@ class Members(Resource):
     Everything but the timestamps is expected in a PUT request.
     '''
 
-    method_decorators = [ requires_auth ]
+    method_decorators = [ requires_auth() ]
 
     def from_row(self, row):
         '''
@@ -49,9 +48,6 @@ class Members(Resource):
             "email": row[5],
         }
 
-    def roles_for_member(self, cur, member_id):
-        return []
-
     def list(self):
         '''
         GET /members
@@ -65,17 +61,7 @@ class Members(Resource):
         '''
         cur.execute(query)
 
-        def add_roles(member_obj):
-            member_obj['roles'] = []
-            cur.execute('select role from members_roles where member = %s', (
-                member_obj['id'],))
-
-            for role in cur.fetchall():
-                member_obj['roles'].append(role[0])
-
-            return member_obj
-
-        members = [add_roles(self.from_row(row)) for row in cur.fetchall()]
+        members = [self.from_row(row) for row in cur.fetchall()]
 
         db.commit()
         cur.close()
@@ -96,17 +82,11 @@ class Members(Resource):
         cur.execute(query, (member_id,))
         row = cur.fetchone()
 
-        cur.execute('select role from members_roles where member = %s', (member_id,))
-        roles = []
-        for row in cur.fetchall():
-            roles.append(row[0])
-
         db.commit()
         cur.close()
 
         if row:
             member_obj = self.from_row(row)
-            member_obj['roles'] = roles
             return { 'error': None, 'data': member_obj }, 200
         else:
             return { 'error': 'No member found with given ID' }, 404
@@ -118,6 +98,10 @@ class Members(Resource):
         :param member_id: Numeric ID of the member in our database
         :return: either the results of fetch or list
         '''
+
+        if not requires_scope('read:members'):
+            return { 'error': 'Missing scope: read:members' }, 401
+
         if member_id:
             return self.fetch(member_id)
         else:
@@ -127,6 +111,10 @@ class Members(Resource):
         '''
         POST /members
         '''
+
+        if not requires_scope('create:members'):
+            return { 'error': 'Missing scope: create:members' }, 401
+
         body = request.get_json()
 
         required_keys = [ 'first_name', 'last_name' ]
@@ -140,7 +128,6 @@ class Members(Resource):
         email = body.get('email', None)
         active = body.get('active', False)
         notes = body.get('notes', None)
-        roles = body.get('roles', None)
 
         query = '''
         insert into members (first_name, last_name, active, email, notes)
@@ -159,7 +146,6 @@ class Members(Resource):
         # Now deal with roles
         body['id'] = cur.fetchone()[0]
         body['active'] = active
-        body['roles'] = roles or []
 
         db.commit()
         cur.close()
@@ -174,12 +160,15 @@ class Members(Resource):
 
         :param member_id: Numeric ID of the member in our database
         '''
+        if not requires_scope('update:members'):
+            return { 'error': 'Missing scope: update:members' }, 401
+
         if not member_id:
             return { 'error': 'No member ID specified' }, 400
 
         body = request.get_json()
         required_keys = [ 'first_name', 'last_name', 'active',
-                          'email', 'notes', 'roles' ]
+                          'email', 'notes' ]
         missing_keys = filter(lambda rk: rk not in body, required_keys)
         if len(missing_keys):
             return {
@@ -214,18 +203,6 @@ class Members(Resource):
             cur.close()
             return { 'error': str(e) }, 500
 
-        # TODO update roles as well
-        roles = body.get('roles', None)
-        if roles is not None:
-            cur.execute('delete from members_roles where member = %s',
-                        (member_id,))
-            for role in roles:
-                q = '''
-                insert into members_roles (member, role)
-                values (%s, %s)
-                '''
-                cur.execute(q, (member_id, role))
-
         db.commit()
         cur.close()
 
@@ -239,11 +216,14 @@ class Members(Resource):
 
         :param member_id: Numeric ID of the member from the database.
         '''
+
+        if not requires_scope('update:members'):
+            return { 'error': 'Missing scope: update:members' }, 401
+
         if not member_id:
             return { 'error': 'No member ID specified' }, 400
 
         body = request.get_json()
-        roles = body.pop('roles', None)
 
         query_tmpl = '''
         update members set ({}) = %s where id = %s
@@ -253,16 +233,6 @@ class Members(Resource):
 
         db = get_db()
         cur = db.cursor()
-
-        if roles is not None:
-            cur.execute('delete from members_roles where member = %s',
-                        (member_id,))
-            for role in roles:
-                q = '''
-                insert into members_roles (member, role)
-                values (%s, %s)
-                '''
-                cur.execute(q, (member_id, role))
 
         # we popped `roles` out of `body` so if nothing else remains we're
         # square.
@@ -279,13 +249,11 @@ class Members(Resource):
             cur.close()
             db.commit()
             return { 'error': 'Invalid member ID' }, 400
-
         try:
             cur.execute(query, params)
         except Exception, e:
             cur.close()
             return { 'error': str(e) }, 500
-
 
         db.commit()
         cur.close()
@@ -297,6 +265,9 @@ class Members(Resource):
 
         :param member_id: Numeric ID of the member from the database.
         '''
+        if not requires_scope('delete:members'):
+            return { 'error': 'Missing key: delete:members' }, 401
+
         if not member_id:
             return { 'error': 'No member ID specified' }, 400
 
@@ -308,7 +279,6 @@ class Members(Resource):
         if not exists:
             return { 'error': 'Invalid member ID' }, 400
 
-        cur.execute('delete from members_roles where member = %s', (member_id,))
         cur.execute('delete from members where id = %s', (member_id,))
         db.commit()
         cur.close()

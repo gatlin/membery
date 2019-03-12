@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import './Members.css';
+
 /**
  * A row in the members table that supports inline editing.
  *
@@ -35,8 +37,7 @@ export class MembersTableRow extends Component {
                 last_name,
                 email,
                 notes,
-                active,
-                roles
+                active
             }
         });
     };
@@ -45,9 +46,9 @@ export class MembersTableRow extends Component {
     save = () => {
         const id = this.props.member.id ? this.props.member.id : null;
         const { first_name, last_name, email,
-                notes, active, roles } = this.state.editingData;
+                notes, active } = this.state.editingData;
         this.props.save({
-            id, first_name, last_name, email, notes, active, roles
+            id, first_name, last_name, email, notes, active
         }, this.props.newMember).
             then(() => {
                 this.setState({
@@ -137,8 +138,7 @@ export class MembersTableRow extends Component {
             first_name,
             last_name,
             email,
-            notes,
-            roles
+            notes
         } = this.props.member;
 
         return (
@@ -202,7 +202,6 @@ export class MembersTable extends Component {
                   last_name: '',
                   email: '',
                   notes: '',
-                  roles: [],
                   active: true
               }}
             />
@@ -213,7 +212,7 @@ export class MembersTable extends Component {
         const { members, updateMember, deleteMember } = this.props;
         return (
             <div id='members'>
-              <table>
+              <table className='admin-table'>
                 <caption>Members</caption>
                 <thead>
                   <tr>

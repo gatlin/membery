@@ -1,0 +1,20 @@
+div#members {
+    width: 100%;
+}
+
+table.admin-table, table.admin-table thead, table.admin-table tr {
+    width: 100%;
+}
+
+table.admin-table th {
+    text-align: left;
+    padding: 0;
+    border-spacing: 0;
+}
+
+table.admin-table tr {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}

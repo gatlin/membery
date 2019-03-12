@@ -12,7 +12,8 @@ export default class Auth extends EventEmitter {
             responseType: 'token id_token',
             audience: AUTH_CONFIG.apiUrl,
             params: {
-                scope: 'openid profile'
+                scope: 'openid profile read:members create:members'
+                    + ' update:members delete:members'
             }
         }
     });
