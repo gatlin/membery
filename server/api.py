@@ -33,10 +33,6 @@ def create_app():
     api = Api(app)
 
     with app.app_context():
-        api.add_resource(resources.roles.Roles,
-                         api_prefix + '/roles',
-                         api_prefix + '/roles/',
-                         api_prefix + '/roles/<role_id>')
         api.add_resource(resources.members.Members,
                          api_prefix + '/members',
                          api_prefix + '/members/',

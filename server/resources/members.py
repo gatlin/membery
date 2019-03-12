@@ -143,7 +143,6 @@ class Members(Resource):
             cur.close()
             return { 'error': str(e) }, 500
 
-        # Now deal with roles
         body['id'] = cur.fetchone()[0]
         body['active'] = active
 
@@ -234,8 +233,6 @@ class Members(Resource):
         db = get_db()
         cur = db.cursor()
 
-        # we popped `roles` out of `body` so if nothing else remains we're
-        # square.
         if len(body.keys()) == 0:
             db.commit()
             cur.close()

@@ -1,8 +1,3 @@
-create table if not exists roles (
-    id bigserial primary key,
-    name text unique not null
-);
-
 create table if not exists members (
     id bigserial primary key,
     first_name text not null,
@@ -12,11 +7,6 @@ create table if not exists members (
     email text,
     created timestamp without time zone default now(),
     updated timestamp without time zone default now()
-);
-
-create table if not exists members_roles (
-    member bigint not null references members(id),
-    role bigint not null references roles(id)
 );
 
 create table if not exists committees (
@@ -48,10 +38,3 @@ create table if not exists interests (
     member bigint not null references members(id),
     topic bigint not null references interest_topics(id)
 );
-
--- default roles
-insert into roles (name) values ('admin')
-    on conflict (name) do nothing;
-
-insert into roles (name) values ('member')
-    on conflict (name) do nothing;
