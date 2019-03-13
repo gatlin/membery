@@ -12,3 +12,4 @@ six==1.12.0
 Werkzeug==0.14.1
 python-jose
 flask-cors
+requests==2.17.3

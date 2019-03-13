@@ -3,7 +3,7 @@ from flask_restful import reqparse, abort, Resource
 from db import get_db
 import psycopg2
 import json
-from auth import requires_auth, requires_scope
+from auth import requires_auth, requires_scope, create_auth0_user
 
 class Members(Resource):
     '''
@@ -91,7 +91,7 @@ class Members(Resource):
         else:
             return { 'error': 'No member found with given ID' }, 404
 
-    def get(self, member_id=None):
+    def get(self, member_id=None, payload=None):
         '''
         Dispatch our two varieties of GET request
 
@@ -117,7 +117,7 @@ class Members(Resource):
 
         body = request.get_json()
 
-        required_keys = [ 'first_name', 'last_name' ]
+        required_keys = [ 'first_name', 'last_name', 'email' ]
         missing_keys = filter(lambda rk: rk not in body,
                               required_keys)
         if len(missing_keys):
@@ -125,9 +125,15 @@ class Members(Resource):
 
         first_name = body['first_name']
         last_name = body['last_name']
-        email = body.get('email', None)
+        email = body['email']
         active = body.get('active', False)
         notes = body.get('notes', None)
+
+        # first create an auth0 user
+        try:
+            create_auth0_user(email)
+        except Exception, e:
+            return { 'error': str(e) }, 500
 
         query = '''
         insert into members (first_name, last_name, active, email, notes)
