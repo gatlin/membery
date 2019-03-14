@@ -1,5 +1,3 @@
-import React from 'react';
-import { connect } from 'react-redux';
 // Actions
 
 export const CLEAR_MEMBERS = 'membery/members/clear_members';
@@ -65,9 +63,9 @@ export default function(state = initialState, action) {
 // Action creators
 
 export const loadMembers = () => (dispatch, getState, { auth }) => {
-    return auth.authFetch('/members').
-        then(response => response.json()).
-        then(({ data }) => {
+    return auth.authFetch('/members')
+        .then(response => response.json())
+        .then(({ data }) => {
             dispatch({
                 type: SET_MEMBERS,
                 data
@@ -79,23 +77,22 @@ export const updateMember = (
     data,
     newMember = false
 ) => (dispatch, getState, { auth }) => {
-    let url, method;
     let req;
     if (newMember) { // Create new member
         delete data['id'];
         req = auth.authFetch('/members', {
             method: 'POST',
             body: JSON.stringify(data)
-        }).
-            then(response => response.json()).
-            then(({ data }) => data);
+        })
+            .then(response => response.json())
+            .then(({ data }) => data);
     }
     else { // Update existing member
         req = auth.authFetch(`/members/${data['id']}`, {
             method: 'PUT',
             body: JSON.stringify(data)
-        }).
-            then(() => {
+        })
+            .then(() => {
                 return data;
             });
     }
@@ -112,8 +109,8 @@ export const updateMember = (
 export const deleteMember = (member_id) => (dispatch, getState, { auth }) => {
     return auth.authFetch(`/members/${member_id}`, {
         method: 'DELETE'
-    }).
-        then(() => {
+    })
+        .then(() => {
             dispatch({
                 type: RM_MEMBER,
                 data: member_id

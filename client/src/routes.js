@@ -1,8 +1,7 @@
 import React from 'react';
-import { withRouter } from 'react-router';
 import { Route, Router } from 'react-router-dom';
 import App from './App';
-import Home from './Home/Home';
+import Home from './containers/Home';
 import { MembersPage } from './containers/Members';
 import Callback from './Callback/Callback';
 

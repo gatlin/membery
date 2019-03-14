@@ -27,8 +27,7 @@ export class MembersTableRow extends Component {
             last_name,
             email,
             active,
-            notes,
-            roles
+            notes
         } = { ...this.props.member };
         this.setState({
             editing: true,
@@ -49,8 +48,8 @@ export class MembersTableRow extends Component {
                 notes, active } = this.state.editingData;
         this.props.save({
             id, first_name, last_name, email, notes, active
-        }, this.props.newMember).
-            then(() => {
+        }, this.props.newMember)
+            .then(() => {
                 this.setState({
                     editing: false,
                     editingData: {}
@@ -134,7 +133,6 @@ export class MembersTableRow extends Component {
 
     renderNormal() {
         const {
-            id,
             first_name,
             last_name,
             email,

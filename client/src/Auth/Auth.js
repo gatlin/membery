@@ -92,7 +92,7 @@ export default class Auth extends EventEmitter {
     }
 
     authFetch(url, options) {
-        const prefix = 'http://localhost:5001/api/v1';
+        const prefix = `${AUTH_CONFIG.memberyApiUrl}/api/v1`;
         const headers = {
             Accept: 'application/json',
             'Content-Type': 'application/json'
