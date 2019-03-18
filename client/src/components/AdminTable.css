@@ -12,9 +12,16 @@ table.admin-table th {
     border-spacing: 0;
 }
 
-table.admin-table tr {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
+table.admin-table tbody tr {
+    padding: 1rem;
+}
+
+table.admin-table tbody tr td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+table.admin-table tbody tr:hover {
+    background-color: #b9b9b9;
 }

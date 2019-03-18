@@ -7,10 +7,6 @@ import thunk from 'redux-thunk';
 import Membery, { default_state } from './reducers';
 import Auth from './Auth/Auth';
 
-import * as membersActions from './services/members';
-import * as commActions from './services/committees';
-import * as meetingsActions from './services/meetings';
-
 import { makeMainRoutes } from './routes';
 
 const auth = new Auth();
@@ -30,7 +26,3 @@ ReactDOM.render(
     </Provider>,
     document.getElementById('root')
 );
-
-store.dispatch(membersActions.loadMembers());
-store.dispatch(commActions.loadCommittees());
-store.dispatch(meetingsActions.loadMeetings());

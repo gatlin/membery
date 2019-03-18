@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-import './Members.css';
+import './AdminTable.css';
 
 function formatDate(date) {
     return `${date.toDateString()} ${date.toTimeString()}`;
@@ -55,6 +55,11 @@ export class MeetingsTableRow extends Component {
             start_time,
             end_time
         } = this.state.editingData;
+
+        if (!name || !committee || !start_time || !end_time) {
+            console.log('not yet, captain');
+            return;
+        }
         console.log('editingData', this.state.editingData);
         this.props.save({
             id, name, committee, start_time, end_time
@@ -75,9 +80,6 @@ export class MeetingsTableRow extends Component {
 
         const start_time_d = start_time ? new Date(start_time) : new Date();
         const end_time_d = end_time ? new Date(end_time) : new Date();
-
-        console.log('start_time', start_time_d);
-        console.log('end_time', end_time_d);
 
         return (
             <tr>

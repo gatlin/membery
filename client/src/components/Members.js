@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import './Members.css';
+import './AdminTable.css';
 
 /**
  * A row in the members table that supports inline editing.
@@ -48,8 +48,8 @@ export class MembersTableRow extends Component {
                 notes, active } = this.state.editingData;
         this.props.save({
             id, first_name, last_name, email, notes, active
-        }, this.props.newMember).
-            then(() => {
+        }, this.props.newMember)
+            .then(() => {
                 this.setState({
                     editing: false,
                     editingData: {}
@@ -133,7 +133,6 @@ export class MembersTableRow extends Component {
 
     renderNormal() {
         const {
-            id,
             first_name,
             last_name,
             email,

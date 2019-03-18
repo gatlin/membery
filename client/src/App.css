@@ -1,3 +1,11 @@
-.btn-margin {
-  margin: 7px 3px;
+.header-btn {
+    border: 0;
+    padding: 2rem;
+    flex: 1 1 0;
+}
+
+#header-btns {
+    display: flex;
+    flex-direction: row;
+    background-color: #b9b9b9;
 }

@@ -9,8 +9,8 @@ def from_row(row):
         'id': row[0],
         'committee': row[1],
         'name': row[2],
-        'start_time': row[3].strftime('%Y-%m-%dT%H:%M:%S'),
-        'end_time': row[4].strftime('%Y-%m-%dT%H:%M:%S')
+        'start_time': row[3].strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'end_time': row[4].strftime('%Y-%m-%dT%H:%M:%SZ')
     }
 
 class Meetings(Resource):

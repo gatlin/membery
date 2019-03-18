@@ -18,12 +18,13 @@ export const Home = ({
       !isAuthenticated() && (
           <h4>
             You are not logged in! Please{' '}
-            <a
+            <button
+              className='link-btn'
               style={{ cursor: 'pointer' }}
               onClick={ () => { login(); }}
             >
               Log In
-            </a>
+            </button>
             {' '} to continue.
           </h4>
         )

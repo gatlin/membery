@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import './Members.css';
+import './AdminTable.css';
 
 /**
  * A row in the committees table that supports inline editing.

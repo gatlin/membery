@@ -18,32 +18,30 @@ const App = ({
     <div>
       <nav>
         <header>
-          <div>
-            <a href="#">Membery</a>
-          </div>
-          <button
-            className="btn-margin"
-            onClick={() => { goTo('home'); }}
-          >
-            Home
-          </button>
+
           {
           !isAuthenticated() && (
-              <span id='main-btns'>
+              <span id='header-btns'>
                 <button
                   id="qsLoginBtn"
-                  className="btn-margin"
+                  className="header-btn"
                   onClick={() => { login(); }}
                 >
                   Log In
                 </button>
               </span>
-          )
-          }
+          )}
           {
               isAuthenticated() && (
-                  <span id='main-btns'>
+                  <span id='header-btns'>
                     <button
+                      className="header-btn"
+                      onClick={() => { goTo('home'); }}
+                    >
+                      Home
+                    </button>
+                    <button
+                      className='header-btn'
                       id='btn-nav-members'
                       onClick={() => {
                           loadMembers();
@@ -53,6 +51,7 @@ const App = ({
                       Members
                     </button>
                     <button
+                      className='header-btn'
                       id='btn-nav-committees'
                       onClick={() => {
                           loadCommittees();
@@ -62,6 +61,7 @@ const App = ({
                       Committees
                     </button>
                     <button
+                      className='header-btn'
                       id='btn-nav-meetings'
                       onClick={() => {
                           loadMeetings();
@@ -71,17 +71,18 @@ const App = ({
                       Meetings
                     </button>
                     <button
+                      className='header-btn'
                       id="qsLogoutBtn"
-                      className="btn-margin"
                       onClick={() => { logout(); }}
                     >
                       Log Out
                     </button>
                   </span>
-              )
-          }
-        </header>
-      </nav>
+                )
+            }
+
+      </header>
+    </nav>
     </div>
 );
 
