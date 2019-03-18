@@ -7,9 +7,9 @@ import thunk from 'redux-thunk';
 import Membery, { default_state } from './reducers';
 import Auth from './Auth/Auth';
 
-import * as membersActions from './members';
-import * as commActions from './committees';
-import * as meetingsActions from './meetings';
+import * as membersActions from './services/members';
+import * as commActions from './services/committees';
+import * as meetingsActions from './services/meetings';
 
 import { makeMainRoutes } from './routes';
 

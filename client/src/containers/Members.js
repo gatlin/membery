@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { MembersTable as MT } from '../components/Members';
-import * as membersActions from '../members';
+import * as membersActions from '../services/members';
 
 /**
  * Connected components

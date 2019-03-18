@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { CommitteesTable as CT } from '../components/Committees';
-import * as actions from '../committees';
+import * as actions from '../services/committees';
 
 /**
  * Connected components

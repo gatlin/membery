@@ -71,11 +71,12 @@ export const updateCommittee = (
     newCommittee = false
 ) => (dispatch, getState, { auth }) => {
     let req;
+    const body = JSON.stringify(data);
     if (newCommittee) { // create new committee
         delete data['id'];
         req = auth.authFetch('/committees', {
             method: 'POST',
-            body: JSON.stringify(data)
+            body
         })
             .then(response => response.json())
             .then(({ data }) => data);
@@ -83,7 +84,7 @@ export const updateCommittee = (
     else { // Update existing member
         req = auth.authFetch(`/committees/${data['id']}`, {
             method: 'PUT',
-            body: JSON.stringify(data)
+            body
         })
             .then(() => {
                 return data;

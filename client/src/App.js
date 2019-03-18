@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import * as authActions from './Auth';
-import * as membersActions from './members';
-import * as committeesActions from './committees';
-import * as meetingsActions from './meetings';
+import * as membersActions from './services/members';
+import * as committeesActions from './services/committees';
+import * as meetingsActions from './services/meetings';
 import './App.css';
 
 const App = ({

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { MeetingsTable as CT } from '../components/Meetings';
-import * as actions from '../meetings';
+import * as actions from '../services/meetings';
 
 /**
  * Connected components
