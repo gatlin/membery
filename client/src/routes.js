@@ -3,6 +3,8 @@ import { Route, Router } from 'react-router-dom';
 import App from './App';
 import Home from './containers/Home';
 import { MembersPage } from './containers/Members';
+import { CommitteesPage } from './containers/Committees';
+import { MeetingsPage } from './containers/Meetings';
 import Callback from './Callback/Callback';
 
 import history from './history';
@@ -25,7 +27,14 @@ export const makeMainRoutes = (auth) => {
           <Route path="/home" render={
               (props) =><Home auth={auth} goTo={goTo} {...props} />
           } />
-          <Route path="/members" render={(props) => (<MembersPage {...props}/>)}></Route>
+          <Route path="/members" render={(props) => (<MembersPage
+                                                       {...props}/>)}></Route>
+          <Route path='/committees' render={(props) => (
+              <CommitteesPage { ...props }/>
+          )}></Route>
+          <Route path='/meetings' render={(props) => (
+              <MeetingsPage { ...props }/>
+          )}></Route>
           <Route path="/callback" render={(props) => {
               handleAuthentication({ ...props, auth });
               return (<Callback {...props} />);

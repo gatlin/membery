@@ -48,8 +48,8 @@ export class MembersTableRow extends Component {
                 notes, active } = this.state.editingData;
         this.props.save({
             id, first_name, last_name, email, notes, active
-        }, this.props.newMember)
-            .then(() => {
+        }, this.props.newMember).
+            then(() => {
                 this.setState({
                     editing: false,
                     editingData: {}
@@ -60,7 +60,7 @@ export class MembersTableRow extends Component {
     renderEditing() {
         const { id } = this.props.member;
         const { first_name, last_name, email,
-                active, notes } = this.state.editingData;
+                /* active, */ notes } = this.state.editingData;
         return (
             <tr>
               <td><input
@@ -133,6 +133,7 @@ export class MembersTableRow extends Component {
 
     renderNormal() {
         const {
+            id,
             first_name,
             last_name,
             email,
@@ -214,12 +215,14 @@ export class MembersTable extends Component {
                 <caption>Members</caption>
                 <thead>
                   <tr>
-                    <button
-                      onClick={() => {
-                          this.createNewMember(!this.state.creatingNewMember);
-                      }}>
-                      { this.state.creatingNewMember ? 'Cancel' : 'New Member' }
+                    <th>
+                      <button
+                        onClick={() => {
+                            this.createNewMember(!this.state.creatingNewMember);
+                        }}>
+                        { this.state.creatingNewMember ? 'Cancel' : 'New Member' }
                       </button>
+                    </th>
                   </tr>
                   <tr>
                     <th>First Name</th>

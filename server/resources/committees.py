@@ -1,6 +1,7 @@
 from flask import request
 from flask_restful import reqparse, abort, Resource
 from db import get_db
+from auth import requires_auth, requires_scope
 
 class Committees(Resource):
     '''
@@ -16,6 +17,8 @@ class Committees(Resource):
     `name` is a required field for POST / PUT. Technically it's not required for
     PATCH but that would be extremely pointless.
     '''
+
+    method_decorators = [ requires_auth() ]
 
     def list(self):
         '''
@@ -78,15 +81,17 @@ class Committees(Resource):
         db = get_db()
         cur = db.cursor()
         try:
-            cur.execute('insert into committees (name) values (%s)', (committee_name,))
+            cur.execute('insert into committees (name) values (%s) returning id', (committee_name,))
         except psycopg2.IntegrityError, e:
             cur.close()
             return { 'error': str(e) }, 500
 
+        body['id'] = cur.fetchone()[0]
+
         db.commit()
         cur.close()
 
-        return { 'error': None }, 201
+        return { 'error': None, 'data': body }, 201
 
     def put(self, committee_id=None):
         '''

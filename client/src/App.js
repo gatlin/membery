@@ -1,7 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import * as authActions from './Auth';
 import * as membersActions from './members';
+import * as committeesActions from './committees';
+import * as meetingsActions from './meetings';
 import './App.css';
 
 const App = ({
@@ -9,6 +11,8 @@ const App = ({
     logout,
     goTo,
     loadMembers,
+    loadCommittees,
+    loadMeetings,
     isAuthenticated
 })=> (
     <div>
@@ -49,6 +53,24 @@ const App = ({
                       Members
                     </button>
                     <button
+                      id='btn-nav-committees'
+                      onClick={() => {
+                          loadCommittees();
+                          goTo('committees');
+                      }}
+                    >
+                      Committees
+                    </button>
+                    <button
+                      id='btn-nav-meetings'
+                      onClick={() => {
+                          loadMeetings();
+                          goTo('meetings');
+                      }}
+                    >
+                      Meetings
+                    </button>
+                    <button
                       id="qsLogoutBtn"
                       className="btn-margin"
                       onClick={() => { logout(); }}
@@ -69,6 +91,8 @@ export default connect(
         login: () => dispatch(authActions.login()),
         logout: () => dispatch(authActions.logout()),
         isAuthenticated: () => dispatch(authActions.isAuthenticated()),
-        loadMembers: () => dispatch(membersActions.loadMembers())
+        loadMembers: () => dispatch(membersActions.loadMembers()),
+        loadCommittees: () => dispatch(committeesActions.loadCommittees()),
+        loadMeetings: () => dispatch(meetingsActions.loadMeetings())
     })
 )(App);
