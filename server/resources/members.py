@@ -19,7 +19,8 @@ class Members(Resource):
         "email": <string | null>,
         "notes": <string | null>,
         "created": <timestamp>,
-        "updated": <timestamp>
+        "updated": <timestamp>,
+        "roles": [<id:role ID>]
     }
 
     Creating a member requires only:
@@ -60,10 +61,18 @@ class Members(Resource):
         from members
         '''
         cur.execute(query)
+        db.commit()
 
         members = [self.from_row(row) for row in cur.fetchall()]
 
-        db.commit()
+        q = '''
+        select role from members_roles where member = %s
+        '''
+        for member in members:
+            cur.execute(q, (member['id'],))
+            member['roles'] = [ row[0] for row in cur.fetchall() ]
+            db.commit()
+
         cur.close()
 
         return { 'error': None, 'data': members }, 200
@@ -83,12 +92,18 @@ class Members(Resource):
         row = cur.fetchone()
 
         db.commit()
-        cur.close()
 
         if row:
             member_obj = self.from_row(row)
+            cur.execute('select role from members_roles where member = %s', (
+                member_id,
+            ))
+            member_obj['roles'] = [row[0] for row in cur.fetchall()]
+            db.commit()
+            cur.close()
             return { 'error': None, 'data': member_obj }, 200
         else:
+            cur.close()
             return { 'error': 'No member found with given ID' }, 404
 
     def get(self, member_id=None, payload=None):
@@ -181,6 +196,8 @@ class Members(Resource):
                 'fields': missing_keys
             }, 400
 
+        member_roles = body.get('roles', [])
+
         query = '''
         update members set first_name = %s, last_name = %s,
         active = %s, email = %s, notes = %s, updated = now()
@@ -209,9 +226,39 @@ class Members(Resource):
             return { 'error': str(e) }, 500
 
         db.commit()
+
+        # Now update those roles
+        role_update_err = self.update_roles(member_id,member_roles, db, cur)
+        if role_update_err:
+            return { 'error': str(role_update_err) }, 500
+
         cur.close()
 
         return { 'error': None }, 204
+
+    def update_roles(self, member_id, roles, db, cur):
+        role_rm_q = '''
+        delete from members_roles where member = %s
+        '''
+        try:
+            cur.execute(role_rm_q, (member_id,))
+        except psycopg2.IntegrityError, e:
+            return e
+
+        role_q = '''
+        insert into members_roles (member, role) values (%s, %s)
+        '''
+        for role in roles:
+            try:
+                cur.execute(role_q, (member_id, role))
+            except psycopg2.IntegrityError, e:
+                cur.close()
+                return e
+
+            # Success
+            db.commit()
+
+        return None
 
     def patch(self, member_id=None):
         '''
@@ -229,6 +276,9 @@ class Members(Resource):
             return { 'error': 'No member ID specified' }, 400
 
         body = request.get_json()
+
+        member_roles = body.get('roles', None)
+        body.pop('roles')
 
         query_tmpl = '''
         update members set ({}) = %s where id = %s
@@ -259,6 +309,12 @@ class Members(Resource):
             return { 'error': str(e) }, 500
 
         db.commit()
+
+        # Now update roles
+        role_update_err = self.update_roles(member_id, member_roles, db, cur)
+        if role_update_err:
+            return { 'error': str(role_update_err) }, 500
+
         cur.close()
         return { 'error': None }, 204
 
@@ -282,7 +338,12 @@ class Members(Resource):
         if not exists:
             return { 'error': 'Invalid member ID' }, 400
 
+        # Delete its roles
+        cur.execute('delete from members_roles where member = %s', (member_id,))
+        db.commit()
+
         cur.execute('delete from members where id = %s', (member_id,))
         db.commit()
         cur.close()
+
         return { 'error': None }, 204

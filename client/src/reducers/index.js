@@ -10,14 +10,20 @@ import meetings, {
     initialState as meetingsInitialState
 } from '../services/meetings';
 
+import roles_perms, {
+    initialState as RPinitialState
+} from '../services/roles_perms';
+
 export const default_state = {
     members: membersInitialState,
     committees: commInitialState,
-    meetings: meetingsInitialState
+    meetings: meetingsInitialState,
+    roles_perms: RPinitialState
 };
 
 export default combineReducers({
     members,
     committees,
-    meetings
+    meetings,
+    roles_perms
 });

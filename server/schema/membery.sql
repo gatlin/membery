@@ -38,3 +38,21 @@ create table if not exists interests (
     member bigint not null references members(id),
     topic bigint not null references interest_topics(id)
 );
+
+create table if not exists permissions (
+    name text unique primary key
+);
+
+create table if not exists roles (
+    id bigserial primary key, name text unique not null, description text
+);
+
+create table if not exists roles_perms (
+    role bigint not null references roles(id),
+    permission text not null references permissions(name)
+);
+
+create table if not exists members_roles (
+    member bigint references members(id),
+    role bigint references roles(id)
+);

@@ -2,7 +2,7 @@ from functools import wraps
 from flask import request, _request_ctx_stack
 from six.moves.urllib.request import urlopen
 import json
-from jose import jwt
+from jose import jwt, JWTError
 import random
 import string
 import requests

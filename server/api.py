@@ -46,6 +46,16 @@ def create_app():
                          api_prefix + '/meetings/',
                          api_prefix + '/meetings/<meeting_id>')
 
+        api.add_resource(resources.roles_perms.Permissions,
+                         api_prefix + '/permissions',
+                         api_prefix + '/permissions/',
+                         api_prefix + '/permisisons/<perm>')
+
+        api.add_resource(resources.roles_perms.Roles,
+                         api_prefix + '/roles',
+                         api_prefix + '/roles/',
+                         api_prefix + '/roles/<role_id>')
+
         api.add_resource(UserData, api_prefix + '/user-data')
     CORS(app)
     return app

@@ -1,45 +1,55 @@
 import history from '../history';
 import { EventEmitter } from 'events';
 import Auth0Lock from 'auth0-lock';
+import auth0 from 'auth0-js';
 import { AUTH_CONFIG } from './auth0-variables';
 
-export default class Auth extends EventEmitter {
-    lock = new Auth0Lock(AUTH_CONFIG.clientId, AUTH_CONFIG.domain, {
-        oidcConformant: true,
-        autoclose: true,
-        auth: {
-            redirectUrl: AUTH_CONFIG.callbackUrl,
-            responseType: 'token id_token',
-            audience: AUTH_CONFIG.apiUrl,
-            params: {
-                scope: 'openid profile read:members create:members'
-                    + ' update:members delete:members'
-            }
-        }
+export default class Auth /* extends EventEmitter */ {
+
+    auth0 = new auth0.WebAuth({
+        domain: AUTH_CONFIG['domain'],
+        clientID: AUTH_CONFIG['clientId'],
+        redirectUri: AUTH_CONFIG['callbackUrl'],
+        responseType: 'token id_token',
+        scope: 'openid profile read:members create:members '
+            + 'update:members delete:members',
+        // Leave this out and we get the wrong kind of token
+        audience: AUTH_CONFIG['apiUrl']
+
     });
 
     userProfile;
 
-    handleAuthentication() {
-        console.log('what does this do?');
-    }
-
     constructor() {
-        super();
-        // Add callback Lock's `authenticated` event
-        this.lock.on('authenticated', this.setSession.bind(this));
-        // Add callback for Lock's `authorization_error` event
-        this.lock.on('authorization_error', error => console.log(error));
-        // binds functions to keep this context
+
+        // Method bindings, ugh
         this.login = this.login.bind(this);
         this.logout = this.logout.bind(this);
-        this.getProfile = this.getProfile.bind(this);
+        this.handleAuthentication = this.handleAuthentication.bind(this);
+        this.isAuthenticated = this.isAuthenticated.bind(this);
+        this.getAccessToken = this.getAccessToken.bind(this);
+        this.getIdToken = this.getIdToken.bind(this);
+        this.renewSession = this.renewSession.bind(this);
         this.authFetch = this.authFetch.bind(this);
     }
 
     login() {
         // Call the show method to display the widget.
-        this.lock.show();
+        this.auth0.authorize();
+    }
+
+    handleAuthentication() {
+        this.auth0.parseHash((err, authResult) => {
+            if (authResult && authResult.accessToken && authResult.idToken) {
+                this.setSession(authResult);
+            }
+            else if (err) {
+                history.replace('/home');
+                console.log(err);
+                alert(`Error: ${err.error}. Check the console for further`
+                      + ` details.`);
+            }
+        });
     }
 
     setSession(authResult) {
@@ -64,13 +74,24 @@ export default class Auth extends EventEmitter {
         return accessToken;
     }
 
-    getProfile(cb) {
-        let accessToken = this.getAccessToken();
-        this.lock.getUserInfo(accessToken, (err, profile) => {
-            if (profile) {
-                this.userProfile = profile;
+    getIdToken() {
+        const idToken = localStorage.getItem('id_token');
+        if (!idToken) {
+            throw new Error('No ID token found');
+        }
+        return idToken;
+    }
+
+    renewSession() {
+        this.auth0.checkSession({}, (err, authResult) => {
+            if (authResult && authResult.accessToken && authResult.idToken) {
+                this.setSession(authResult);
+            } else if (err) {
+                this.logout();
+                console.log(err);
+                alert(`Could not get a new token (${err.error}:`
+                      + ` ${err.error_description}).`);
             }
-            cb(err, profile);
         });
     }
 

@@ -65,6 +65,7 @@ const App = ({
                       id='btn-nav-meetings'
                       onClick={() => {
                           loadMeetings();
+                          loadCommittees();
                           goTo('meetings');
                       }}
                     >

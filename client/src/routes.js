@@ -5,6 +5,7 @@ import Home from './containers/Home';
 import { MembersPage } from './containers/Members';
 import { CommitteesPage } from './containers/Committees';
 import { MeetingsPage } from './containers/Meetings';
+import { RolesPermsPage } from './containers/RolesPerms';
 import Callback from './Callback/Callback';
 
 import history from './history';
@@ -35,10 +36,14 @@ export const makeMainRoutes = (auth) => {
           <Route path='/meetings' render={(props) => (
               <MeetingsPage { ...props }/>
           )}></Route>
+          <Route path='/roles-perms' render={(props) => (
+              <RolesPermsPage { ...props }/>
+          )}/>
           <Route path="/callback" render={(props) => {
               handleAuthentication({ ...props, auth });
               return (<Callback {...props} />);
           }}/>
+
         </div>
       </Router>
   );
