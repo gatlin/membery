@@ -1,6 +1,15 @@
 import React, { Component } from 'react';
+import Select from 'react-select';
 
 import './AdminTable.css';
+
+// Converts a role object into the form we want for `react-select`
+function make_role_option({ id, name }) {
+    return ({
+        value: id,
+        label: name
+    });
+}
 
 /**
  * A row in the members table that supports inline editing.
@@ -27,7 +36,8 @@ export class MembersTableRow extends Component {
             last_name,
             email,
             active,
-            notes
+            notes,
+            roles
         } = { ...this.props.member };
         this.setState({
             editing: true,
@@ -36,7 +46,8 @@ export class MembersTableRow extends Component {
                 last_name,
                 email,
                 notes,
-                active
+                active,
+                roles
             }
         });
     };
@@ -45,9 +56,11 @@ export class MembersTableRow extends Component {
     save = () => {
         const id = this.props.member.id ? this.props.member.id : null;
         const { first_name, last_name, email,
-                notes, active } = this.state.editingData;
+                notes, active, roles } = this.state.editingData;
+
+
         this.props.save({
-            id, first_name, last_name, email, notes, active
+            id, first_name, last_name, email, notes, active, roles
         }, this.props.newMember)
             .then(() => {
                 this.setState({
@@ -60,7 +73,12 @@ export class MembersTableRow extends Component {
     renderEditing() {
         const { id } = this.props.member;
         const { first_name, last_name, email,
-                /* active, */ notes } = this.state.editingData;
+                /* active, */ notes, roles } = this.state.editingData;
+
+        const roles_options = Object.keys(this.props.roles)
+              .map(role_id => this.props.roles[role_id])
+              .map(make_role_option);
+
         return (
             <tr>
               <td><input
@@ -111,7 +129,28 @@ export class MembersTableRow extends Component {
                             }
                         });
                     }}>
-              </input></td>
+                  </input></td>
+              <td>
+                <Select
+                  isMulti
+                  value={roles.map(role_id => {
+                      const role = this.props.roles[role_id.toString()];
+                      return make_role_option(role);
+                  })}
+                  options={roles_options}
+                  onChange={ selected_roles => {
+                      const member_roles = selected_roles.map(({ value }) =>
+                                                              value);
+                      this.setState({
+                          editingData: {
+                              ...this.state.editingData,
+                              roles: member_roles
+                          }
+                      });
+                  }}
+                >
+                </Select>
+              </td>
 
               <td>
                 <button
@@ -136,8 +175,15 @@ export class MembersTableRow extends Component {
             first_name,
             last_name,
             email,
-            notes
+            notes,
+            roles
         } = this.props.member;
+
+        const roles_names = roles
+              .map(id => this.props.roles[id.toString()].name)
+              .join(',');
+
+        console.log('roles_names', roles_names);
 
         return (
             <tr>
@@ -145,6 +191,7 @@ export class MembersTableRow extends Component {
               <td>{ last_name }</td>
               <td>{ email } </td>
               <td>{ notes }</td>
+              <td>{ roles_names }</td>
               <td>
                 <button
                   onClick={() => { this.setEditing(); }}
@@ -207,7 +254,13 @@ export class MembersTable extends Component {
     };
 
     render () {
-        const { members, updateMember, deleteMember } = this.props;
+        const {
+            members,
+            updateMember,
+            deleteMember,
+            roles,
+            perms
+        } = this.props;
         return (
             <div id='members'>
               <table className='admin-table'>
@@ -228,6 +281,7 @@ export class MembersTable extends Component {
                     <th>Last Name</th>
                     <th>Email</th>
                     <th>Notes</th>
+                    <th>Roles</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -239,6 +293,7 @@ export class MembersTable extends Component {
                         del={ (d) => { return deleteMember(d); } }
                         key={`members-table-row-${i}`}
                         member={ { ...members[pk] } }
+                        roles={roles}
                       />
                   ))}
                 </tbody>

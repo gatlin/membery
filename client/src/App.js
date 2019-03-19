@@ -4,6 +4,7 @@ import * as authActions from './Auth';
 import * as membersActions from './services/members';
 import * as committeesActions from './services/committees';
 import * as meetingsActions from './services/meetings';
+import * as rpActions from './services/roles_perms';
 import './App.css';
 
 const App = ({
@@ -13,6 +14,7 @@ const App = ({
     loadMembers,
     loadCommittees,
     loadMeetings,
+    loadRoles,
     isAuthenticated
 })=> (
     <div>
@@ -45,6 +47,7 @@ const App = ({
                       id='btn-nav-members'
                       onClick={() => {
                           loadMembers();
+                          loadRoles();
                           goTo('members');
                       }}
                     >
@@ -95,6 +98,7 @@ export default connect(
         isAuthenticated: () => dispatch(authActions.isAuthenticated()),
         loadMembers: () => dispatch(membersActions.loadMembers()),
         loadCommittees: () => dispatch(committeesActions.loadCommittees()),
-        loadMeetings: () => dispatch(meetingsActions.loadMeetings())
+        loadMeetings: () => dispatch(meetingsActions.loadMeetings()),
+        loadRoles: () => dispatch(rpActions.loadRoles())
     })
 )(App);

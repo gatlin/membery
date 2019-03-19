@@ -8,7 +8,10 @@ import * as membersActions from '../services/members';
  */
 
 export const MembersTable = connect(
-    ({ members }) => ({ members: members.data }),
+    ({ members, roles_perms: { roles } }) => ({
+        members: members.data,
+        roles
+    }),
     dispatch => ({
         updateMember: (d,b) => dispatch(membersActions.updateMember(d,b)),
         deleteMember: (d) => dispatch(membersActions.deleteMember(d))

@@ -113,10 +113,6 @@ class Members(Resource):
         :param member_id: Numeric ID of the member in our database
         :return: either the results of fetch or list
         '''
-
-        if not requires_scope('read:members'):
-            return { 'error': 'Missing scope: read:members' }, 401
-
         if member_id:
             return self.fetch(member_id)
         else:
@@ -126,9 +122,6 @@ class Members(Resource):
         '''
         POST /members
         '''
-
-        if not requires_scope('create:members'):
-            return { 'error': 'Missing scope: create:members' }, 401
 
         body = request.get_json()
 
@@ -180,9 +173,6 @@ class Members(Resource):
 
         :param member_id: Numeric ID of the member in our database
         '''
-        if not requires_scope('update:members'):
-            return { 'error': 'Missing scope: update:members' }, 401
-
         if not member_id:
             return { 'error': 'No member ID specified' }, 400
 
@@ -245,6 +235,8 @@ class Members(Resource):
         except psycopg2.IntegrityError, e:
             return e
 
+        db.commit()
+
         role_q = '''
         insert into members_roles (member, role) values (%s, %s)
         '''
@@ -268,9 +260,6 @@ class Members(Resource):
 
         :param member_id: Numeric ID of the member from the database.
         '''
-
-        if not requires_scope('update:members'):
-            return { 'error': 'Missing scope: update:members' }, 401
 
         if not member_id:
             return { 'error': 'No member ID specified' }, 400
@@ -324,8 +313,6 @@ class Members(Resource):
 
         :param member_id: Numeric ID of the member from the database.
         '''
-        if not requires_scope('delete:members'):
-            return { 'error': 'Missing key: delete:members' }, 401
 
         if not member_id:
             return { 'error': 'No member ID specified' }, 400
