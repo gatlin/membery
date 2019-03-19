@@ -75,9 +75,11 @@ export class MembersTableRow extends Component {
         const { first_name, last_name, email,
                 /* active, */ notes, roles } = this.state.editingData;
 
-        const roles_options = Object.keys(this.props.roles)
+        const roles_options = this.props.roles
+              ? Object.keys(this.props.roles)
               .map(role_id => this.props.roles[role_id])
-              .map(make_role_option);
+              .map(make_role_option)
+              : [];
 
         return (
             <tr>
@@ -133,7 +135,7 @@ export class MembersTableRow extends Component {
               <td>
                 <Select
                   isMulti
-                  value={roles.map(role_id => {
+                  value={(roles ? roles : []).map(role_id => {
                       const role = this.props.roles[role_id.toString()];
                       return make_role_option(role);
                   })}
@@ -179,9 +181,15 @@ export class MembersTableRow extends Component {
             roles
         } = this.props.member;
 
-        const roles_names = this.props.roles
-              ? roles.map(id => this.props.roles[id.toString()].name)
-              .join(',')
+        if (!this.props.roles) { return null; }
+
+        const roles_names = this.props.roles && roles
+              ? (roles.map(id => {
+                  if (this.props.roles[id.toString()]) {
+                      return this.props.roles[id.toString()].name;
+                  }
+                  return '';
+              }).join(','))
               : '';
 
         return (
