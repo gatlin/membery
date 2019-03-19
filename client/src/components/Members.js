@@ -179,11 +179,10 @@ export class MembersTableRow extends Component {
             roles
         } = this.props.member;
 
-        const roles_names = roles
-              .map(id => this.props.roles[id.toString()].name)
-              .join(',');
-
-        console.log('roles_names', roles_names);
+        const roles_names = this.props.roles
+              ? roles.map(id => this.props.roles[id.toString()].name)
+              .join(',')
+              : '';
 
         return (
             <tr>
